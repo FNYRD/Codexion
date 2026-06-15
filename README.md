@@ -24,7 +24,7 @@ scheduler only orders workers that can actually make progress.
 Clone the repository and enter the project directory:
 
 ```sh
-git clone https://github.com/FNYRD/Condexion
+git clone https://github.com/FNYRD/Codexion
 cd Codexion
 ```
 

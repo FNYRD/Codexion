@@ -1,0 +1,139 @@
+USAGE:
+./codexion
+number_of_coders
+time_to_burnout
+time_to_compile
+time_to_debug
+time_to_refactor
+number_of_compiles_required
+dongle_cooldown
+scheduler
+
+====================
+SIMPLE CASES
+====================
+
+1) FIFO simple: 3 coders, 1 compile each. Should finish normally.
+./codexion 3 1000 100 50 50 1 10 fifo
+./codexion 3 1000 100 50 50 1 10 fifo | grep -c "is compiling"
+Expected count: 3
+
+2) EDF simple: 3 coders, 1 compile each. Should finish normally.
+./codexion 3 1000 100 50 50 1 10 edf
+./codexion 3 1000 100 50 50 1 10 edf | grep -c "is compiling"
+Expected count: 3
+
+3) FIFO medium: 5 coders, 2 compiles each. Should finish normally.
+./codexion 5 1500 100 50 50 2 10 fifo
+./codexion 5 1500 100 50 50 2 10 fifo | grep -c "is compiling"
+Expected count: 10
+
+4) EDF medium: 5 coders, 2 compiles each. Should finish normally.
+./codexion 5 1500 100 50 50 2 10 edf
+./codexion 5 1500 100 50 50 2 10 edf | grep -c "is compiling"
+Expected count: 10
+
+5) Check dongle logs: each compile must take 2 dongles.
+./codexion 5 1500 100 50 50 2 10 fifo
+./codexion 5 1500 100 50 50 2 10 fifo | grep -c "has taken a dongle"
+Expected count: 20
+
+====================
+BORDER CASES
+====================
+
+ | grep -c "is compiling"
+ | grep -c "is debugging"
+ | grep -c "is refactoring"
+ | grep -c "has taken a dongle"
+
+6) One coder only. Should finish normally.
+./codexion 1 1000 100 50 50 2 10 fifo
+./codexion 1 1000 100 50 50 2 10 fifo | grep -c "is compiling"
+./codexion 1 1000 100 50 50 2 10 fifo | grep -c "is debugging"
+./codexion 1 1000 100 50 50 2 10 fifo | grep -c "is refactoring"
+./codexion 1 1000 100 50 50 2 10 fifo | grep -c "has taken a dongle"
+Expected count: 2 done
+
+7) One compile required with many coders. Should finish normally.
+./codexion 10 2000 50 20 20 1 10 edf
+./codexion 10 2000 50 20 20 1 10 edf | grep -c "is compiling"
+Expected count: 10 done
+
+8) More compiles per coder. Should finish normally.
+./codexion 10 3000 50 20 20 5 10 fifo
+./codexion 10 3000 50 20 20 5 10 fifo | grep -c "is compiling"
+Expected count: 50 done
+
+9) Fast timings. Should finish normally if scheduling is not stuck.
+./codexion 5 1000 10 10 10 3 1 edf
+./codexion 5 1000 10 10 10 3 1 edf | grep -c "is compiling"
+Expected count: 15 done
+
+10) Bigger worker count. Should finish normally.
+./codexion 20 3000 50 10 10 2 5 edf
+./codexion 20 3000 50 10 10 2 5 edf | grep -c "is compiling"
+Expected count: 40 done
+
+====================
+BURNOUT CASES
+====================
+
+11) Burnout forced: compile time is longer than burnout limit. Should print burnout.
+./codexion 5 80 100 50 50 2 10 fifo
+./codexion 5 80 100 50 50 2 10 fifo | grep -c "burned out"
+Expected count: 1 done
+
+12) Burnout forced in EDF. Should print burnout.
+./codexion 5 80 100 50 50 2 10 edf
+./codexion 5 80 100 50 50 2 10 edf | grep -c "burned out"
+Expected count: 1 done
+
+13) Tight burnout with many coders. Should print burnout.
+./codexion 10 120 100 50 50 3 10 fifo
+./codexion 10 120 100 50 50 3 10 fifo | grep -c "burned out"
+Expected count: 1 done
+
+14) No burnout expected: burnout limit safely larger than cycle pressure.
+./codexion 5 2000 100 50 50 2 10 fifo
+./codexion 5 2000 100 50 50 2 10 fifo | grep -c "burned out"
+Expected count: 0 done
+
+15) Burnout precision visual check. Burnout should appear close to time_to_burnout.
+./codexion 3 150 200 20 20 2 10 fifo
+
+====================
+INVALID INPUTS
+====================
+
+16) Missing argument. Should fail and print nothing or return error.
+./codexion 3 1000 100 50 50 1 fifo
+
+17) Invalid scheduler. Should fail.
+./codexion 3 1000 100 50 50 1 10 random
+
+18) Zero number_of_coders. Should fail.
+./codexion 0 1000 100 50 50 1 10 fifo
+
+19) Zero time_to_burnout. Should fail.
+./codexion 3 0 100 50 50 1 10 fifo
+
+20) Negative value. Should fail.
+./codexion 3 -1000 100 50 50 1 10 fifo
+
+21) Non numeric value. Should fail.
+./codexion 3 abc 100 50 50 1 10 fifo
+
+22) Number with letters. Should fail.
+./codexion 3 1000 100x 50 50 1 10 fifo
+
+23) Leading zero. Should fail if your verifier rejects leading zeroes.
+./codexion 03 1000 100 50 50 1 10 fifo
+
+24) Int overflow in number_of_coders. Should fail.
+./codexion 2147483648 1000 100 50 50 1 10 fifo
+
+25) Long overflow in time_to_burnout. Should fail.
+./codexion 3 9223372036854775808 100 50 50 1 10 fifo
+
+

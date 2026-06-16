@@ -64,8 +64,7 @@ typedef struct s_dongle
 {
 	int				id;
 	int				available;
-	pthread_cond_t	cond;
-	pthread_mutex_t	mutex;
+	long			release_time;
 }	t_dongle;
 
 int		len_str(char *argv);
@@ -86,10 +85,9 @@ void	dongling(t_data *data, int i);
 void	*worker_routine(void *worker_raw);
 void	*monitor_routine(void *monitor_raw);
 void	assigning(t_data *data, char **argv);
-void	destroy(t_data *data, int i, int flag);
 void	heap_ready(t_data *data, t_worker *new);
 void	waiting_end(t_data	*data, int i, int j);
-void	freedom(t_data *data, int flag, int code);
+void	freedom(t_data *data, int code);
 void	creating_table(t_data *data, int i, int j);
 void	steering(t_data *data, t_worker *new, int i);
 void	shift_down(t_data *data, int right_index, int left_index);

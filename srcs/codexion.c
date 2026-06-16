@@ -11,7 +11,7 @@ static void	helper_freedom(t_data *data, int flag)
 	pthread_mutex_unlock(&data->general_mutex);
 	while (++i <= (flag - 1))
 		pthread_join(data->workers[i].thread, NULL);
-	freedom(data, 0, 1);
+	freedom(data, 1);
 }
 
 static void	starting_routines(t_data *data, t_monitor *monitor)
@@ -30,9 +30,9 @@ static void	starting_routines(t_data *data, t_monitor *monitor)
 		helper_freedom(data, data->n_workers);
 	while (++k < data->n_workers)
 		if ((pthread_join(data->workers[k].thread, NULL)) != 0)
-			freedom(data, 0, 1);
+			freedom(data, 1);
 	if ((pthread_join(monitor->thread, NULL)) != 0)
-		freedom(data, 0, 1);
+		freedom(data, 1);
 }
 
 int	main(int argc, char **argv)
@@ -53,8 +53,7 @@ int	main(int argc, char **argv)
 	while (++i < data.n_workers)
 		data.workers[i].monitor = &monitor;
 	starting_routines(&data, &monitor);
-	freedom(&data, 0, 0);
+	freedom(&data, 0);
 	return (0);
 }
-// Por hacer
-// Pasar valgrind
+

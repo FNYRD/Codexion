@@ -20,20 +20,6 @@ static void	reserving(t_data *data)
 	}
 }
 
-void	destroy(t_data *data, int i, int flag)
-{
-	if (flag)
-		pthread_mutex_destroy(&data->dongles[i].mutex);
-	i--;
-	while (i >= 0)
-	{
-		pthread_mutex_destroy(&data->dongles[i].mutex);
-		pthread_cond_destroy(&data->dongles[i].cond);
-		i--;
-	}
-	freedom(data, 1, 1);
-}
-
 static void	mutexes(t_data *data)
 {
 	if (pthread_mutex_init(&data->print_mutex, NULL) != 0)

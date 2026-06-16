@@ -29,8 +29,10 @@ static void	worker_ending_routine(t_worker *worker, t_data *data)
 	worker->used += 1;
 	if (worker->used == data->uses_per_worker)
 		worker->monitor->finished += 1;
-	worker->lef_dongle->available = 1;
-	worker->right_dongle->available = 1;
+	worker->lef_dongle->available = 0;
+	worker->lef_dongle->release_time = get_time_ms();
+	worker->right_dongle->available = 0;
+	worker->right_dongle->release_time = get_time_ms();
 	worker->ready = 0;
 	waiting_end(data, -1, 0);
 	pthread_cond_broadcast(&data->general_cond);
@@ -111,6 +113,20 @@ void	*monitor_routine(void *monitor_raw)
 			else
 				usleep(500);
 		}
+		i = -1;
+		pthread_mutex_lock(&data->general_mutex);
+		while (++i < data->n_workers)
+		{
+			if (!data->dongles[i].available
+				&& (get_time_ms() - data->dongles[i].release_time)
+				>= data->cooldown)
+			{
+				data->dongles[i].available = 1;
+				waiting_end(data, -1, 0);
+				pthread_cond_broadcast(&data->general_cond);
+			}
+		}
+		pthread_mutex_unlock(&data->general_mutex);
 	}
 	return (NULL);
 }

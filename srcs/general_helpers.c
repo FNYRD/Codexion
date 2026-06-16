@@ -1,6 +1,6 @@
 #include "codexion.h"
 
-void	freedom(t_data *data, int flag, int code)
+void	freedom(t_data *data, int code)
 {
 	int	i;
 
@@ -10,11 +10,6 @@ void	freedom(t_data *data, int flag, int code)
 		data->workers[i].data = NULL;
 		data->workers[i].lef_dongle = NULL;
 		data->workers[i].right_dongle = NULL;
-		if (!flag)
-		{
-			pthread_mutex_destroy(&data->dongles[i].mutex);
-			pthread_cond_destroy(&data->dongles[i].cond);
-		}
 		i++;
 	}
 	pthread_mutex_destroy(&data->general_mutex);
@@ -48,10 +43,7 @@ void	dongling(t_data *data, int i)
 	while (++i < data->n_workers)
 	{
 		data->dongles[i].id = i;
-		if (pthread_mutex_init(&data->dongles[i].mutex, NULL) != 0)
-			destroy(data, i, 0);
-		if (pthread_cond_init(&data->dongles[i].cond, NULL) != 0)
-			destroy(data, i, 1);
+		data->dongles[i].release_time = 0;
 		data->dongles[i].available = 1;
 	}
 }

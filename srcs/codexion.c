@@ -56,4 +56,6 @@ int	main(int argc, char **argv)
 	freedom(&data, 0);
 	return (0);
 }
-
+// Revisar que el subject no cambio
+// Pasar norminette
+// Pasar valgrind

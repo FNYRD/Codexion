@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routines.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jericard <jericard@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/26 12:51:48 by jericard          #+#    #+#             */
+/*   Updated: 2026/06/26 13:02:54 by jericard         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 static int	worker_waiting_routine(t_worker *worker, t_data *data)
@@ -113,20 +125,7 @@ void	*monitor_routine(void *monitor_raw)
 			else
 				usleep(500);
 		}
-		i = -1;
-		pthread_mutex_lock(&data->general_mutex);
-		while (++i < data->n_workers)
-		{
-			if (!data->dongles[i].available
-				&& (get_time_ms() - data->dongles[i].release_time)
-				>= data->cooldown)
-			{
-				data->dongles[i].available = 1;
-				waiting_end(data, -1, 0);
-				pthread_cond_broadcast(&data->general_cond);
-			}
-		}
-		pthread_mutex_unlock(&data->general_mutex);
+		wake_up(data);
 	}
 	return (NULL);
 }

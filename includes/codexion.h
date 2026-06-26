@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   codexion.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jericard <jericard@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/26 12:51:56 by jericard          #+#    #+#             */
+/*   Updated: 2026/06/26 13:02:39 by jericard         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CODEXION_H
 # define CODEXION_H
 
@@ -79,6 +91,7 @@ int		swap_indexft(t_data *data, int right_index, int left_index);
 long	get_time_ms(void);
 long	ft_atol(const char *nptr);
 
+void	wake_up(t_data *data);
 void	heap_pop(t_data *data);
 void	shift_up(t_data *data);
 void	dongling(t_data *data, int i);

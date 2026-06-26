@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routine_helpers.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jericard <jericard@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/26 12:51:45 by jericard          #+#    #+#             */
+/*   Updated: 2026/06/26 12:55:21 by jericard         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 static void	waiting_push(t_data *data, t_worker *new)
@@ -15,7 +27,7 @@ void	steering(t_data *data, t_worker *new, int i)
 
 	flag = 0;
 	ready = ((data->n_workers > 1)
-				&& (new->lef_dongle->available && new->right_dongle->available));
+			&& (new->lef_dongle->available && new->right_dongle->available));
 	if (ready)
 	{
 		new->ready = 1;
@@ -46,9 +58,9 @@ void	waiting_end(t_data	*data, int i, int j)
 	while (++i <= data->waiting_size)
 	{
 		ready = (((waiting[i]->lef_dongle
-					&& waiting[i]->lef_dongle->available)
-							&& (waiting[i]->right_dongle
-								&& waiting[i]->right_dongle->available)));
+						&& waiting[i]->lef_dongle->available)
+					&& (waiting[i]->right_dongle
+						&& waiting[i]->right_dongle->available)));
 		if (ready)
 		{
 			waiting[i]->ready = 1;

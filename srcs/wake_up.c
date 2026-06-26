@@ -21,6 +21,7 @@ void	wake_up(t_data *data)
 	while (++i < data->n_workers)
 	{
 		if (!data->dongles[i].available
+			&& !data->dongles[i].in_use
 			&& (get_time_ms() - data->dongles[i].release_time)
 			>= data->cooldown)
 		{

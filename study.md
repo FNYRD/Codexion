@@ -5,6 +5,27 @@
 
 ---
 
+## Bugs encontrados y corregidos (durante el repaso)
+
+1. **Cadena vacía aceptada por el verifier** (`verifier.c`). `""` pasaba la validación y
+   con `n_workers=0` colgaba el programa en bucle infinito. **Fix:** `if (argv[i][0] ==
+   '\0') return (1);` en el bucle de `verifier()`.
+
+2. **Duplicación de dongles (crítico)** — dos coders que comparten un dongle podían
+   compilar a la vez. **Causa:** `get_time_ms()` es tiempo absoluto y los dongles tomados
+   no se distinguían de los liberados; `wake_up()` veía `now - release_time >= cooldown`
+   (siempre cierto para un dongle en uso, con `release_time` viejo/0) y **reactivaba un
+   dongle que un coder estaba usando**, dejando que el vecino lo tomara. **Fix:** se añadió
+   el flag `int in_use` a `t_dongle`: se pone a 1 al tomar (`routines.c`), a 0 al liberar,
+   y `wake_up()` solo reactiva si `!in_use`. Así el cooldown nunca toca un dongle en uso.
+   Verificado con un detector de solapamientos: 0 duplicaciones tras el fix, y el cooldown
+   pasó a tener efecto real (puede forzar burnout cuando es alto).
+
+   > No lo detectaban valgrind/tsan porque es un **bug lógico**, no de memoria ni carrera:
+   > todos los accesos están bajo `general_mutex`.
+
+---
+
 ## Parte 1 — Verificación del subject
 
 ### Resumen rápido
@@ -231,9 +252,14 @@ dos veces `has taken a dongle` (flag 1, uno por dongle), saca su entrada del hea
     imprime `burned out` (flag 5) y termina. El poll cada `usleep(500)` (0.5 ms) garantiza
     el log dentro de los 10 ms exigidos.
 - Tras revisar a todos, llama **`wake_up()`** (`wake_up.c`): recorre los dongles y, a los
-  que ya cumplieron su cooldown (`get_time_ms() - release_time >= cooldown`), los pone
-  `available = 1`, llama `waiting_end()` y hace broadcast para despertar a los workers
-  que esperan.
+  que **no están en uso** (`!in_use`) y ya cumplieron su cooldown (`get_time_ms() -
+  release_time >= cooldown`), los pone `available = 1`, llama `waiting_end()` y hace
+  broadcast para despertar a los workers que esperan.
+
+> **Tres estados del dongle** (clave para la defensa): el flag `in_use` + `available`
+> distinguen: **libre** (`available=1`), **en uso** (`in_use=1`, lo sostiene un coder
+> mientras compila) y **en cooldown** (`available=0, in_use=0`, liberado y esperando).
+> `wake_up` solo reactiva los que están en cooldown, nunca los que están en uso.
 
 ### Paso 6 — Cierre y liberación (`freedom`)
 
@@ -297,3 +323,47 @@ mensajes nunca se intercalan en una línea. Además, una vez impreso `burned out
 
 Esto, sumado al mutex único (orden de bloqueo trivial), es lo que mantiene la simulación
 libre de deadlock.
+
+---
+
+## Lo que pide la evaluation sheet (y estado tras el repaso)
+
+| Punto de la eval | Estado verificado |
+|---|---|
+| Compila `-Wall -Wextra -Werror -pthread` sin warnings | ✅ |
+| Argumentos exactos / rechaza inválidos | ✅ (incl. `""` ya corregido) |
+| Cada coder = thread | ✅ |
+| Sin variable global mutable | ✅ |
+| README con todas las secciones requeridas | ⚠️ revisar (ver abajo) |
+| **Easy**: ≤200 coders, ≥60ms, nadie se quema, todos completan | ✅ probado hasta 200 |
+| **Less easy**: burnout edge, logging, timing 10ms, **no duplicación de dongles** | ✅ (duplicación **corregida**) |
+| **Medium**: cooldown, edf vs fifo, serialización de logs | ✅ |
+| Sin data race / deadlock (tsan) | ✅ 0 warnings |
+| Sin memory leaks (leaks) | ✅ 0 leaks |
+
+### ⚠️ Recode de defensa que te pueden pedir
+
+La eval incluye un **recode**: *"Modify EDF to prefer higher coder_id on equal deadlines"*.
+Hoy tu desempate EDF es FIFO (el `<` estricto conserva el orden de llegada). Si te lo
+piden, hay que **desempatar por `id` mayor** cuando dos `last_compile` (deadlines) son
+iguales. Dónde tocar:
+
+- `heap_helpers.c` → `shift_up()` y `shift_down()`/`swap_indexft()`: donde comparan
+  `heap[a]->last_compile < heap[b]->last_compile`, añadir el caso de igualdad para que
+  gane el de **mayor `id`** (intercambiar también cuando `last_compile` es igual y el `id`
+  es mayor). Es un cambio de pocos minutos, justo el tipo de modificación que el recode
+  espera. Practícalo antes de la defensa.
+
+### Comandos de verificación rápidos
+
+```bash
+# nadie se quema y todos completan (n*required compilaciones)
+./codexion 10 4000 100 100 100 3 100 edf | grep -c "is compiling"   # debe dar 30
+./codexion 10 4000 100 100 100 3 100 edf | grep "burned out"        # no debe imprimir nada
+
+# burnout preciso
+./codexion 1 200 100 100 100 5 100 fifo                             # "200 1 burned out"
+
+# leaks (macOS) / valgrind (42)
+leaks --atExit -- ./codexion 5 2000 100 100 100 2 100 fifo
+```

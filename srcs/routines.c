@@ -42,8 +42,10 @@ static void	worker_ending_routine(t_worker *worker, t_data *data)
 	if (worker->used == data->uses_per_worker)
 		worker->monitor->finished += 1;
 	worker->lef_dongle->available = 0;
+	worker->lef_dongle->in_use = 0;
 	worker->lef_dongle->release_time = get_time_ms();
 	worker->right_dongle->available = 0;
+	worker->right_dongle->in_use = 0;
 	worker->right_dongle->release_time = get_time_ms();
 	worker->ready = 0;
 	waiting_end(data, -1, 0);
@@ -68,8 +70,10 @@ void	*worker_routine(void *worker_raw)
 		if (worker_waiting_routine(worker, data))
 			break ;
 		worker->lef_dongle->available = 0;
+		worker->lef_dongle->in_use = 1;
 		printf_log(data, worker, (get_time_ms() - data->start_simulation), 1);
 		worker->right_dongle->available = 0;
+		worker->right_dongle->in_use = 1;
 		printf_log(data, worker, (get_time_ms() - data->start_simulation), 1);
 		heap_pop(data);
 		pthread_mutex_unlock(&data->general_mutex);

@@ -55,6 +55,7 @@ void	dongling(t_data *data, int i)
 	while (++i < data->n_workers)
 	{
 		data->dongles[i].id = i;
+		data->dongles[i].in_use = 0;
 		data->dongles[i].release_time = 0;
 		data->dongles[i].available = 1;
 	}

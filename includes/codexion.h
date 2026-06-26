@@ -75,6 +75,7 @@ typedef struct s_monitor
 typedef struct s_dongle
 {
 	int				id;
+	int				in_use;
 	int				available;
 	long			release_time;
 }	t_dongle;

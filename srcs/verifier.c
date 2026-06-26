@@ -90,6 +90,8 @@ int	verifier(char **argv)
 			return (1);
 		if ((i != 6 && i != 1) && is_max_long(argv[i]))
 			return (1);
+		if (argv[i][0] == '\0')
+			return (1);
 		j = -1;
 		while (++j < len_str(argv[i]))
 			if (is_num(&argv[i][j]) || argv[i][0] < '1')

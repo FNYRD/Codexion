@@ -6,7 +6,7 @@
 /*   By: jericard <jericard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/26 12:51:50 by jericard          #+#    #+#             */
-/*   Updated: 2026/06/26 12:51:51 by jericard         ###   ########.fr       */
+/*   Updated: 2026/06/30 14:58:39 by jericard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,8 @@ int	verifier(char **argv)
 			return (1);
 		j = -1;
 		while (++j < len_str(argv[i]))
-			if (is_num(&argv[i][j]) || argv[i][0] < '1')
+			if (is_num(&argv[i][j]) || ((i == 1 || i == 2 ||
+				i == 6) && argv[i][0] < '1'))
 				return (1);
 	}
 	return (0);

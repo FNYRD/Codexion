@@ -6,7 +6,7 @@
 /*   By: jericard <jericard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/26 12:57:48 by jericard          #+#    #+#             */
-/*   Updated: 2026/06/26 13:04:27 by jericard         ###   ########.fr       */
+/*   Updated: 2026/06/30 14:38:27 by jericard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	wake_up(t_data *data)
 {
 	int	i;
-	
+
 	i = -1;
 	pthread_mutex_lock(&data->general_mutex);
 	while (++i < data->n_workers)

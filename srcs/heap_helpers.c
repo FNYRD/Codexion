@@ -6,7 +6,7 @@
 /*   By: jericard <jericard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/26 12:51:36 by jericard          #+#    #+#             */
-/*   Updated: 2026/06/26 12:51:37 by jericard         ###   ########.fr       */
+/*   Updated: 2026/07/08 13:11:32 by jericard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	shift_up(t_data *data)
 	heap = data->heap;
 	last = heap[index]->last_compile;
 	dad = heap[heap_relatives(index, 3, *data)]->last_compile;
-	while (last < dad)
+	while (last < dad || heap[index]->last_compile == heap[heap_relatives(index, 3, *data)]->last_compile && heap[index]->id > heap[heap_relatives(index, 3, *data)]->id)
 	{
 		swap = heap[index];
 		heap[index] = heap[heap_relatives(index, 3, *data)];
@@ -47,7 +47,9 @@ int	swap_indexft(t_data *data, int right_index, int left_index)
 		return (0);
 	if (right_index > -1)
 	{
-		if (heap[right_index]->last_compile < heap[left_index]->last_compile)
+		if (heap[right_index]->last_compile < heap[left_index]->last_compile ||
+			heap[right_index]->last_compile == heap[left_index]->last_compile &&
+			heap[right_index]->id > heap[left_index]->id)
 			swap_index = right_index;
 		else
 			swap_index = left_index;
@@ -69,7 +71,9 @@ void	shift_down(t_data *data, int right_index, int left_index)
 		if (!swap)
 			return ;
 		dad = heap_relatives(swap, 3, *data);
-		if (data->heap[swap]->last_compile < data->heap[dad]->last_compile)
+		if (data->heap[swap]->last_compile < data->heap[dad]->last_compile ||
+		data->heap[swap]->last_compile == data->heap[dad]->last_compile &&
+			data->heap[swap]->id > data->heap[dad]->id)
 		{
 			swap_worker = data->heap[dad];
 			data->heap[dad] = data->heap[swap];

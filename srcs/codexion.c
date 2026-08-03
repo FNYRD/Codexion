@@ -6,7 +6,7 @@
 /*   By: jericard <jericard@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/26 12:50:53 by jericard          #+#    #+#             */
-/*   Updated: 2026/06/26 12:50:54 by jericard         ###   ########.fr       */
+/*   Updated: 2026/06/30 14:37:59 by jericard         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,5 @@ int	main(int argc, char **argv)
 	freedom(&data, 0);
 	return (0);
 }
-// Revisar que el subject no cambio
 // Pasar norminette
 // Pasar valgrind

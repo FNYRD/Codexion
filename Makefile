@@ -6,13 +6,13 @@
 #    By: jericard <jericard@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/26 12:51:53 by jericard          #+#    #+#              #
-#    Updated: 2026/06/26 13:07:20 by jericard         ###   ########.fr        #
+#    Updated: 2026/06/30 15:00:24 by jericard         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = codexion
 CURRENT_FILE = codexion.c
-#  -fsanitize=thread 
+
 PTHREAD = -pthread
 CFLAGS = cc -Wall -Wextra -Werror -g
 RM = rm -f
